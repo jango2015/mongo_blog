@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 
-namespace Blog.Domain.Models
+namespace Blog.Web.Models.Account
 {
     public class LoginModel
     {

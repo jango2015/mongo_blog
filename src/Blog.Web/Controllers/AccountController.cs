@@ -1,11 +1,11 @@
-﻿using System.Linq;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Blog.Domain.Entities;
-using Blog.Domain.Models;
-using Blog.Infrastructure.Repositories;
+using Blog.Web.Models;
+using Blog.Web.Models.Account;
+using Microsoft.Owin;
+using Microsoft.Owin.Security;
 using MongoDB.Driver;
 
 namespace Blog.Web.Controllers
@@ -33,26 +33,22 @@ namespace Blog.Web.Controllers
             }
 
             var blogContext = new BlogContext();
-            var builder = Builders<User>.Filter;
-            var filter = builder.Eq("Email", model.Email);
-            var list = await blogContext.Users.Find(filter).ToListAsync();
-            var user = list.First();
-
+            var user = await blogContext.Users.Find(x => x.Email == model.Email).SingleOrDefaultAsync();
             if (user == null)
             {
                 ModelState.AddModelError("Email", "Email address has not been registered.");
                 return View(model);
             }
 
-            var identity = new ClaimsIdentity(new[]
+            ClaimsIdentity identity = new ClaimsIdentity(new[]
                 {
                     new Claim(ClaimTypes.Name, user.Name),
                     new Claim(ClaimTypes.Email, user.Email)
                 },
                 "ApplicationCookie");
 
-            var context = Request.GetOwinContext();
-            var authManager = context.Authentication;
+            IOwinContext context = Request.GetOwinContext();
+            IAuthenticationManager authManager = context.Authentication;
 
             authManager.SignIn(identity);
 
@@ -84,13 +80,13 @@ namespace Blog.Web.Controllers
             }
 
             var blogContext = new BlogContext();
-            var user = new User()
+            var user = new User
             {
                 Name = model.Name,
                 Email = model.Email
             };
-            await blogContext.Users.InsertOneAsync(user);
 
+            await blogContext.Users.InsertOneAsync(user);
             return RedirectToAction("Index", "Home");
         }
 

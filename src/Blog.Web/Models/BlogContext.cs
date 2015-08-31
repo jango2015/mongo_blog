@@ -1,8 +1,7 @@
 ﻿using System.Configuration;
-using Blog.Domain.Entities;
 using MongoDB.Driver;
 
-namespace Blog.Infrastructure.Repositories
+namespace Blog.Web.Models
 {
     public class BlogContext
     {
@@ -11,10 +10,8 @@ namespace Blog.Infrastructure.Repositories
         public const string POSTS_COLLECTION_NAME = "posts";
         public const string USERS_COLLECTION_NAME = "users";
 
-        // This is ok... Normally, these or the entire BlogContext
-        // would be put into an IoC container. We aren't using one,
-        // so we'll just keep them statically here as they are 
-        // thread-safe.
+        // This is ok... Normally, they would be put into
+        // an IoC container.
         private static readonly IMongoClient _client;
         private static readonly IMongoDatabase _database;
 
@@ -26,6 +23,8 @@ namespace Blog.Infrastructure.Repositories
         }
 
         public IMongoClient Client => _client;
+
+        public IMongoCollection<Post> Posts => _database.GetCollection<Post>(POSTS_COLLECTION_NAME);
 
         public IMongoCollection<User> Users => _database.GetCollection<User>(USERS_COLLECTION_NAME);
     }

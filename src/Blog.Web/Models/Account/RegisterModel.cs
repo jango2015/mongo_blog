@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Blog.Domain.Models
+namespace Blog.Web.Models.Account
 {
     public class RegisterModel
     {
